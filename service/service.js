@@ -212,8 +212,6 @@ const assetsForSales = async (contractAddress, timeInterval) => {
         })
         
         const record = {};
-        // record['start_date'] = formatDate(new Date(timeCount - 1000*60*timeInterval / (MiniInterval * 100)));
-        // record['end_date'] = formatDate(new Date(timeCount));
         record['start_date'] = timeCount - 1000*60*timeInterval / (MiniInterval * 100);
         record['end_date'] = timeCount;
         record['volume'] = volume;
