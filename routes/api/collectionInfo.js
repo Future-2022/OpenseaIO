@@ -83,8 +83,4 @@ router.get('/assetsForSalesChart/:contractAddress/:timeInterval', async (req, re
   }
 });
 
-
-
-
-
 module.exports = router;
