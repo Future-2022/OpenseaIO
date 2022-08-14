@@ -84,20 +84,6 @@ router.get('/assetsForSalesChart/:contractAddress/:timeInterval', async (req, re
 });
 
 
-// //@route GET api/getCollectionInfo/:collection_slug
-// //@access Private
-
-// router.get('/getCollectionInfo/:collection_slug', async(req, res) => {
-//   try{
-//     const collectionSlug = req.params.collection_slug;
-
-//     const collectionStatData = await getCollectionInfo(collectionSlug);
-//     res.json(collectionStatData);
-//   } catch(err) {
-//     console.log(err)
-//     res.status(500).json('Server Error'); 
-//   }
-// });
 
 
 
