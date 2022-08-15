@@ -99,20 +99,6 @@ router.get('/assetsForSalesChart/:contractAddress/:timeInterval', async (req, re
 //   }
 // });
 
-// // @router GET api/collectionInfo/getContractInfo/:address
-// // @access Private
-
-// router.get(`/getContractInfo/:address`, async(req, res) => {
-//   try{
-//     const address = req.params.address;
-//     const contractData = await getContractInfo(address);
-//     res.json(contractData);
-//   } catch(err) {
-//     console.log(err)
-//     res.status(500).json('Server Error'); 
-//   }
-// });
-
 
 
 module.exports = router;
