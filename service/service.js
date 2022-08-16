@@ -3,7 +3,7 @@ const moment = require("moment");
 const {formatDate} = require('./util');
 const sql = require("../config/mySql");
 const options = {method: 'GET', headers: {Accept: 'application/json', 'X-API-KEY': '7c01ed670df3403bb8105e5587f93d7f'}};
-const LimitNumber = 100;
+const LimitNumber = 1000;
 const ItemNumber = 8;
 const MiniInterval = 60;
 
@@ -217,7 +217,6 @@ const assetsForSales = async (contractAddress, timeInterval) => {
         record['volume'] = volume;
         record['avg_volume'] = itemNum == 0 ? volume = 0 : volume / itemNum;
         record['item_num'] = itemNum;
-
         listingHistory[key].push(record);
         
         sql.query(`INSERT INTO assetsForSales (start_date, end_date, volume, avg_volume, item_num) VALUES ('${timeCount - 1000*60*timeInterval / (MiniInterval * 100)}', '${timeCount}', ${volume}, ${ itemNum == 0 ? volume = 0 : volume / itemNum}, ${itemNum})`, function (err) {
@@ -226,6 +225,10 @@ const assetsForSales = async (contractAddress, timeInterval) => {
         });
     }    
     return listingHistory;
+}
+
+const getSellWall = async (contractAddress, priceInterval) => {
+    const collectionStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&limit=${LimitNumber}&event_type=successful`, options)).data;
 }
 
 module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales };
