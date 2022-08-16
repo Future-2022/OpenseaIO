@@ -229,6 +229,11 @@ const assetsForSales = async (contractAddress, timeInterval) => {
 
 const getSellWall = async (contractAddress, priceInterval) => {
     const collectionStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&limit=${LimitNumber}&event_type=successful`, options)).data;
+    const assetData = collectionStats["asset_events"];
+
+    assetData.map(item => {
+        
+    })
 }
 
-module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales };
+module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales, getSellWall };
