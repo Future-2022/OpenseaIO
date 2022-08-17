@@ -13,7 +13,16 @@ const delay = (time) => {
 
 const  getCollectionInfoV1  = async (pageNumber, pageLimit) => {
     const collectionData = (await axios.get(`https://api.opensea.io/api/v1/collections?offset=${pageNumber}&limit=${LimitNumber}`, options)).data;
-    return collectionData;
+    console.log(collectionData);
+    const response = {};
+    const key = "collectionsInfo";
+    response[key] = [];
+    collectionData.collections.map(item => {
+      if(item['primary_asset_contracts'] != null && item['primary_asset_contracts'] != [] && item['primary_asset_contracts'].length > 0) {
+        response[key].push(item);
+      }
+    })
+    return response;
 }
 
 
@@ -185,7 +194,7 @@ const saveListingData = async (contractAddress, timeInterval) => {
             // console.log("1 record inserted");
         });
     }    
-    return salesStats;
+    return listingHistory;
 }
 
 const assetsForSales = async (contractAddress, timeInterval) => {
@@ -410,6 +419,7 @@ const getHolderInfoByTime = async (contractAddress, from, to) => {
             data: record
         })
     }    
+
     return result;  
 }
 
