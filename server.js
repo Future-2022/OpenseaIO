@@ -25,8 +25,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Define Routes
 
 app.use('/api/collectionInfo', require('./routes/api/collectionInfo'));
-app.use('/api/listingInfo', require('./routes/api/listing'));
-app.use('/api/assetInfo', require('./routes/api/assets'));
 
 http.listen(5000, ()=> {
      console.log('listening on *:5000');
