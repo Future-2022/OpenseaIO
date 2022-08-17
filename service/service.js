@@ -3,9 +3,13 @@ const moment = require("moment");
 const {formatDate} = require('./util');
 const sql = require("../config/mySql");
 const options = {method: 'GET', headers: {Accept: 'application/json', 'X-API-KEY': '7c01ed670df3403bb8105e5587f93d7f'}};
-const LimitNumber = 1000;
+const LimitNumber = 200;
 const ItemNumber = 8;
 const MiniInterval = 60;
+
+const delay = (time) => {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 const  getCollectionInfoV1  = async (pageNumber, pageLimit) => {
     const collectionData = (await axios.get(`https://api.opensea.io/api/v1/collections?offset=${pageNumber}&limit=${LimitNumber}`, options)).data;
@@ -226,14 +230,188 @@ const assetsForSales = async (contractAddress, timeInterval) => {
     }    
     return listingHistory;
 }
-
+ 
 const getSellWall = async (contractAddress, priceInterval) => {
     const collectionStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&limit=${LimitNumber}&event_type=successful`, options)).data;
     const assetData = collectionStats["asset_events"];
+    const tempArray = [];
+    const sellWall = {};
+    var keys = 'SellWall';
+    sellWall[keys] = [];
+
+    var query = "DELETE FROM sellWall";
+    sql.query(query, function (err, result) {
+        if (err) throw err;
+        console.log("All records has been deleted");
+    });
+
+    for(var cnt =0; cnt < 1500; cnt++) {
+        tempArray[cnt] = 0;
+    }
 
     assetData.map(item => {
-        
+        if(item['listing_time'] == null) {            
+            tempArray[parseInt((item['total_price'] / (10 ** 18))/priceInterval)]++;
+        }
     })
+    tempArray.map((item, key) => {
+        const record = {};
+        record['low_price'] = key * priceInterval;
+        record['high_price'] = (key + 1) * priceInterval;
+        record['main_value'] = item;
+        sellWall[keys].push(record);
+        sql.query(`INSERT INTO sellWall (low_price, high_price, main_value) VALUES (${key * priceInterval}, ${(key + 1) * priceInterval}, ${item})`, function (err) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    })
+    return sellWall;
 }
 
-module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales, getSellWall };
+const getHolderInfo = async (contractAddress) => {
+    let collectionData;
+    let index = 0;
+    let response = [];
+    while (true) {
+        try {
+        collectionData = (
+            await axios.get(
+            `https://api.opensea.io/api/v1/bundles?asset_contract_address=${contractAddress}&limit=50&offset=${index}`,
+            options
+            )
+        ).data;
+        console.log(collectionData);
+        if (collectionData.bundles.length == 0) {
+            break;
+        }
+        for (let bundle of collectionData.bundles) {
+            for (let tData of bundle.assets) {
+            response.push({
+                address: tData.owner.address,
+                token_id: tData.token_id,
+            });
+            }
+        }    
+        index += 50;
+        await delay(300);
+        } catch (err) {
+        console.log("err", err);
+        break;
+        }
+    }
+
+    var seenNames = {};
+    array = response.filter(function(currentObject) {
+        if (currentObject.address in seenNames) {
+            return false;
+        } else {
+            seenNames[currentObject.address] = true;
+            return true;
+        }
+    });
+    array.forEach((node) => node.cnt = 0)
+    array.forEach(item => {
+        for(var cnt = 0; cnt < response.length; cnt++) {
+            if(item['address'] == response[cnt]['address']) {
+                item['cnt']++;
+            }
+        }
+    })
+    record = [
+        {'count': 0, 'percentage': 0},
+        {'count': 0, 'percentage': 0},
+        {'count': 0, 'percentage': 0},
+        {'count': 0, 'percentage': 0}
+    ];
+    array.map(item => {
+        if (item['cnt'] == 1) {
+            record[0]['count']++;
+        } else if (item ['cnt'] <= 3 && item['cnt'] >= 2 ) {
+            record[1]['count']++;
+        } else if (item ['cnt'] <= 7 && item['cnt'] >= 4 ) {
+            record[2]['count']++;
+        } else if (item ['cnt'] <= 46 && item['cnt'] >= 7 ) {
+            record[3]['count']++;
+        }
+    })    
+    record.map(item => {
+        item['percentage'] = (item['count'] / array.length * 100).toFixed(3) + "%";
+    })
+    return collectionData;    
+}
+
+const getHolderInfoByTime = async (contractAddress, from, to) => {
+    const nowTime = new Date(from);
+    const prevTime = new Date(to);
+
+    const result = [];
+
+    var query = "DELETE FROM holder";
+    sql.query(query, function (err, result) {
+        if (err) throw err;
+        console.log("All records has been deleted");
+    });
+
+    const response = [];
+    for(var timeCnt = nowTime.getTime(); timeCnt < prevTime.getTime(); timeCnt += 86400000) {
+        const holderInfo = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&occurred_before=${formatDate(new Date(timeCnt+86400000))}&occurred_after=${formatDate(new Date(timeCnt))}&event_type=successful`, options)).data
+    
+        holderInfo.asset_events.map(item => {
+            response.push({
+                address: item.asset.owner.address,
+                token_id: item.asset.token_id
+            })
+        })
+
+        console.log(response);
+        var seenNames = {};
+        array = response.filter(function(currentObject) {
+            if (currentObject.address in seenNames) {
+                return false;
+            } else {
+                seenNames[currentObject.address] = true;
+                return true;
+            }
+        });
+        array.forEach((node) => node.cnt = 0)
+        array.forEach(item => {
+            for(var cnt = 0; cnt < response.length; cnt++) {
+                if(item['address'] == response[cnt]['address']) {
+                    item['cnt']++;
+                }
+            }
+        })
+        record = [
+            {'count': 0, 'percentage': 0},
+            {'count': 0, 'percentage': 0},
+            {'count': 0, 'percentage': 0},
+            {'count': 0, 'percentage': 0}
+        ];
+        array.map(item => {
+            if (item['cnt'] == 1) {
+                record[0]['count']++;
+            } else if (item ['cnt'] <= 3 && item['cnt'] >= 2 ) {
+                record[1]['count']++;
+            } else if (item ['cnt'] <= 7 && item['cnt'] >= 4 ) {
+                record[2]['count']++;
+            } else if (item ['cnt'] <= 46 && item['cnt'] >= 7 ) {
+                record[3]['count']++;
+            }
+        })    
+        record.map(item => {
+            item['percentage'] = (item['count'] / array.length * 100).toFixed(3) + "%";
+        })  
+        sql.query(`INSERT INTO holder (ExDate, data) VALUES ('${formatDate(new Date(timeCnt))}', '${record}')`, function (err) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+        result.push({
+            ExDate: formatDate(new Date(timeCnt)),
+            data: record
+        })
+    }    
+    return result;  
+}
+
+module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales, getSellWall,
+    getHolderInfo, getHolderInfoByTime };
