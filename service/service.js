@@ -29,7 +29,6 @@ const  getCollectionInfoV1  = async (pageNumber, pageLimit) => {
 const getSalesDataAssets =async (contractAddress) => {
     const collectionStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&limit=${LimitNumber}&event_type=successful`, options)).data;
 
-    console.log(collectionStats["asset_events"]);
     const assetData = collectionStats["asset_events"];
 
     const salesData = {};
@@ -62,8 +61,8 @@ const getSalesDataAssets =async (contractAddress) => {
         }
     });
 
-    console.log(salesData[key].length);
-    return assetData; 
+    console.log(salesData[key]);
+    return salesData; 
 }
 
 const getListingDataAssets =async (contractAddress) => {
