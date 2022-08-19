@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var app = require('express')();
 const cors = require('cors');
 const fs = require('fs');
-
+const userRoute = require('./routes/api/user');
 var http = require('http').createServer(app);
 
 app.use(cors({
@@ -22,9 +22,10 @@ con.connect(function(err) {
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-// Define Routes
 
+// Define Routes
 app.use('/api/collectionInfo', require('./routes/api/collectionInfo'));
+app.use('/api/user', userRoute);
 
 http.listen(5000, ()=> {
      console.log('listening on *:5000');

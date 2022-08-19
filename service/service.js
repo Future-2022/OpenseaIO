@@ -7,6 +7,22 @@ const LimitNumber = 200;
 const ItemNumber = 8;
 const MiniInterval = 60;
 
+const UpdateInterval = 86400000;
+const defaultContractAddress = "0xf76179bb0924ba7da8e7b7fc2779495d7a7939d8";
+const defaultTimeInterval = "1200";
+const defaultpriceInterval = "0.0001";
+const from = "2022-07-12";
+const to = "2022-08-19";
+
+function intervalFunc() {
+    saveSalesData(defaultContractAddress, defaultTimeInterval);
+    saveListingData(defaultContractAddress, defaultTimeInterval);
+    assetsForSales(defaultContractAddress, defaultTimeInterval);
+    getSellWall(defaultContractAddress, defaultpriceInterval);
+    getHolderInfoByTime(defaultContractAddress, from, to);
+}
+setInterval(intervalFunc, UpdateInterval);
+
 const delay = (time) => {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
