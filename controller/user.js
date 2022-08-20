@@ -206,7 +206,6 @@ const Sendblue = async (email, link) => {
 
 const forgetsendmail = async (req, res) => {
     const { email } = req.body;
-    console.log(email);
     sql.query(`SELECT * from usertable where email = '${email}'`, async function (err, result) {
         if (err) throw err;
         isUser = Object.values(JSON.parse(JSON.stringify(result)))
