@@ -95,7 +95,6 @@ const signInWithEmail = async (req, res) => {
     });
 }
 
-
 const Sendblue = async (email, link) => {
     var options = {
         method: 'POST',
@@ -230,28 +229,34 @@ const forgetsendmail = async (req, res) => {
                 if (err) throw err;
                 console.log("1 record inserted");
             });
+
             return res.send({
                 status: 'ok',
                 user: user
             })
+
         }
     });
 };
 
 const resetPassword = async(req, res) => {
     const { token, password } = req.body;
-    const result = await Users.find({ resetcode: token });
-    if(result[0].password === password){
-        return res.send({
-            status: 'ok',
-            userInfo: result[0],
-        })
-    }else{
-        return res.send({
-            status: 'error',
-            message: 'password not match',
-        })
-    }
+    console.log(token);
+    sql.query(`SELECT * from usertable where resetcode = '${token}'`, async function (err, result) {
+        if (err) throw err;
+        isUser = Object.values(JSON.parse(JSON.stringify(result)))
+        if(isUser[0].password === password) {
+            return res.send({
+                status: 'ok',
+                userInfo: isUser[0] 
+            });
+        } else {
+            return res.send({
+                status: 'error',
+                message: 'password not match' 
+            })
+        }
+    });
 }
 
 module.exports = {
