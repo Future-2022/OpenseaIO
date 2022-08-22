@@ -58,6 +58,7 @@ router.get('/saveSalesDataChart/:contractAddress/:timeInterval', async (req, res
     res.status(500).send('Server Error');
   }
 });
+
 router.get('/saveListingDataChart/:contractAddress/:timeInterval', async (req, res) => {
   try {
     const contractAddress = req.params.contractAddress;
@@ -70,6 +71,7 @@ router.get('/saveListingDataChart/:contractAddress/:timeInterval', async (req, r
     res.status(500).send('Server Error');
   }
 });
+
 router.get('/assetsForSalesChart/:contractAddress/:timeInterval', async (req, res) => {
   try {
     const contractAddress = req.params.contractAddress;
@@ -82,6 +84,7 @@ router.get('/assetsForSalesChart/:contractAddress/:timeInterval', async (req, re
     res.status(500).send('Server Error');
   }
 });
+
 router.get('/getSellWall/:contractAddress/:priceInterval', async (req, res) => {
   try {
     const contractAddress = req.params.contractAddress;
@@ -93,6 +96,7 @@ router.get('/getSellWall/:contractAddress/:priceInterval', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 router.get('/getHolderInfo/:contractAddress', async (req, res) => {
   try {
     const contractAddress = req.params.contractAddress;
