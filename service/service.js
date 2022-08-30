@@ -70,8 +70,7 @@ const getSalesDataAssets =async (contractAddress) => {
                 if(item['asset']['name'].indexOf('#') > 0)
                     record['rarity'] = Number(item['asset']['name'].split('#')[1]);
                 else 
-                    record['rarity'] = 0;
-                    
+                    record['rarity'] = 0;                   
                 salesData[key].push(record);
             }
         }
@@ -171,7 +170,6 @@ const saveListingData = async (contractAddress, timeInterval) => {
     const nowTime = new Date();
     const prevTime = new Date(nowTime.getTime()-1000*60*timeInterval);
     const salesStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&occurred_before=${formatDate(nowTime)}&occurred_after=${formatDate(prevTime)}&event_type=successful`, options)).data;
-    console.log('---+++---', salesStats);
     const listingHistory = {};
     var key = "ListingHistory";
     listingHistory[key] = [];
