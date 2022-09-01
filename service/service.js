@@ -6,7 +6,7 @@ const options = {method: 'GET', headers: {Accept: 'application/json', 'X-API-KEY
 const LimitNumber = 200;
 const ItemNumber = 8;
 const MiniInterval = 60;
-
+const {calculatorBuyRank} = require('./api');
 const UpdateInterval = 86400000;
 const defaultContractAddress = "0xf76179bb0924ba7da8e7b7fc2779495d7a7939d8";
 const defaultTimeInterval = "1200";
@@ -112,11 +112,12 @@ const getListingDataAssets =async (contractAddress) => {
                 else 
                     record['rarity'] = 0;
                     
+                record['buy_rank'] =  Math.floor(record['rarity'] / 10) + 25;  
                 salesData[key].push(record);
             }
         }
     });
-    console.log(salesData[key]);
+    // console.log(salesData[key]);
     return salesData; 
 }
 
@@ -198,6 +199,8 @@ const saveListingData = async (contractAddress, timeInterval) => {
         record['volume'] = volume;
         record['avg_volume'] = itemNum == 0 ? volume = 0 : volume / itemNum;
         record['item_num'] = itemNum;
+        if(0 < record['start_date'] && record['start_date'] < 1000*60*timeInterval/4)
+            record['type'] = 'rare';
 
         listingHistory[key].push(record);
         
@@ -205,7 +208,8 @@ const saveListingData = async (contractAddress, timeInterval) => {
             if (err) throw err;
             // console.log("1 record inserted");
         });
-    }    
+    } 
+
     return listingHistory;
 }
 
@@ -434,6 +438,11 @@ const getHolderInfoByTime = async (contractAddress, from, to) => {
     }    
     return result;  
 }
-
+const getFloorPrice = async (contractAddress) => {
+    const collectionStats = (await axios.get(`https://api.opensea.io/api/v1/collection/${contractAddress}`, options)).data;
+    console.log(collectionStats.collection.stats.floor_price);
+    const result = {"floor_price": collectionStats.collection.stats.floor_price};
+    return result;
+}
 module.exports = { getCollectionInfoV1, getSalesDataAssets, getListingDataAssets, saveSalesData, saveListingData, assetsForSales, getSellWall,
-    getHolderInfo, getHolderInfoByTime };
+    getHolderInfo, getHolderInfoByTime, getFloorPrice };
