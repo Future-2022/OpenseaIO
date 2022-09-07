@@ -309,10 +309,10 @@ const getHolderInfo = async (contractAddress) => {
         }
         for (let bundle of collectionData.bundles) {
             for (let tData of bundle.assets) {
-            response.push({
-                address: tData.owner.address,
-                token_id: tData.token_id,
-            });
+                response.push({
+                    address: tData.owner.address,
+                    token_id: tData.token_id,
+                });
             }
         }    
         index += 50;
@@ -332,6 +332,7 @@ const getHolderInfo = async (contractAddress) => {
             return true;
         }
     });
+    
     array.forEach((node) => node.cnt = 0)
     array.forEach(item => {
         for(var cnt = 0; cnt < response.length; cnt++) {
