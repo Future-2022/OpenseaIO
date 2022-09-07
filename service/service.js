@@ -171,7 +171,7 @@ const saveListingData = async (contractAddress, timeInterval) => {
     const nowTime = new Date();
     const prevTime = new Date(nowTime.getTime()-1000*60*timeInterval);
     const salesStats = (await axios.get(`https://api.opensea.io/api/v1/events?asset_contract_address=${contractAddress}&occurred_before=${formatDate(nowTime)}&occurred_after=${formatDate(prevTime)}&event_type=successful`, options)).data;
-    console.log(salesStats);
+    console.log('---+++---', salesStats);
     const listingHistory = {};
     var key = "ListingHistory";
     listingHistory[key] = [];
@@ -303,7 +303,7 @@ const getHolderInfo = async (contractAddress) => {
             options
             )
         ).data;
-        console.log(collectionData);
+        console.log('----------', collectionData);
         if (collectionData.bundles.length == 0) {
             break;
         }
@@ -322,7 +322,7 @@ const getHolderInfo = async (contractAddress) => {
         break;
         }
     }
-
+    console.log(response);
     var seenNames = {};
     array = response.filter(function(currentObject) {
         if (currentObject.address in seenNames) {
@@ -332,7 +332,6 @@ const getHolderInfo = async (contractAddress) => {
             return true;
         }
     });
-    
     array.forEach((node) => node.cnt = 0)
     array.forEach(item => {
         for(var cnt = 0; cnt < response.length; cnt++) {
@@ -361,7 +360,8 @@ const getHolderInfo = async (contractAddress) => {
     record.map(item => {
         item['percentage'] = (item['count'] / array.length * 100).toFixed(3) + "%";
     })
-    return collectionData;    
+    console.log(record);
+    return record;    
 }
 
 const getHolderInfoByTime = async (contractAddress, from, to) => {
@@ -434,7 +434,6 @@ const getHolderInfoByTime = async (contractAddress, from, to) => {
             data: record
         })
     }    
-
     return result;  
 }
 
